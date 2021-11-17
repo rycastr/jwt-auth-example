@@ -1,8 +1,11 @@
+import { Route, Routes } from 'react-router-dom'
+
 function App () {
   return (
-    <div>
-      <h1>Welcome to JWT App</h1>
-    </div>
+    <Routes>
+      <Route path="/" element={<h1>Home Page</h1>} />
+      <Route path="about" element={<h1>About Page</h1>} />
+    </Routes>
   )
 }
 
