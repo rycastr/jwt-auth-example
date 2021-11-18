@@ -1,11 +1,14 @@
+import { ChakraProvider, Heading } from '@chakra-ui/react'
 import { Route, Routes } from 'react-router-dom'
 
 function App () {
   return (
-    <Routes>
-      <Route path="/" element={<h1>Home Page</h1>} />
-      <Route path="about" element={<h1>About Page</h1>} />
-    </Routes>
+    <ChakraProvider>
+      <Routes>
+        <Route path="/" element={<Heading>Home Page</Heading>} />
+        <Route path="about" element={<Heading>About Page</Heading>} />
+      </Routes>
+    </ChakraProvider>
   )
 }
 
