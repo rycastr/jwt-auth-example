@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react'
 import { FormEvent, useRef } from 'react'
 import { HiEye, HiEyeOff } from 'react-icons/hi'
+import * as yup from 'yup'
 
 export const RegisterForm = (props: HTMLChakraProps<'form'>) => {
   const emailInputRef = useRef<HTMLInputElement>(null)
@@ -22,16 +23,29 @@ export const RegisterForm = (props: HTMLChakraProps<'form'>) => {
 
   const { isOpen, onToggle } = useDisclosure()
 
-  function handleSubmit (event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit (event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    const data = {
-      email: emailInputRef.current?.value,
-      password: passwordInputRef.current?.value,
-      confirmPassword: confirmPasswordInputRef.current?.value
-    }
+    const validationSchema = yup.object().shape({
+      email: yup.string().email().required(),
+      password: yup.string().required().min(5),
+      confirmPassword: yup.string().required()
+    })
 
-    console.log(data)
+    try {
+      const data = await validationSchema.validate({
+        email: emailInputRef.current?.value,
+        password: passwordInputRef.current?.value,
+        confirmPassword: confirmPasswordInputRef.current?.value
+      })
+
+      console.log(data)
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        // TODO: Add error handler to input
+        console.log(error)
+      }
+    }
   }
 
   return (
