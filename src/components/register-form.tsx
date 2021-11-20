@@ -29,21 +29,22 @@ export const RegisterForm = (props: HTMLChakraProps<'form'>) => {
     const validationSchema = yup.object().shape({
       email: yup.string().email().required(),
       password: yup.string().required().min(5),
-      confirmPassword: yup.string().required()
+      confirmPassword: yup.string().required().oneOf([yup.ref('password')], 'Passwords must match')
     })
 
     try {
-      const data = await validationSchema.validate({
+      const { email, password } = await validationSchema.validate({
         email: emailInputRef.current?.value,
         password: passwordInputRef.current?.value,
         confirmPassword: confirmPasswordInputRef.current?.value
-      })
+      }, { abortEarly: false })
 
-      console.log(data)
-    } catch (error) {
-      if (error instanceof yup.ValidationError) {
-        // TODO: Add error handler to input
-        console.log(error)
+      console.log({ email, password })
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        err.inner.forEach((error) => {
+          console.log(error)
+        })
       }
     }
   }
