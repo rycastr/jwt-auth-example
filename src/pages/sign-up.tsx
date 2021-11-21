@@ -1,16 +1,10 @@
 import {
   Box,
-  Button,
   Heading,
-  SimpleGrid,
   Text,
-  useColorModeValue,
-  VisuallyHidden
+  useColorModeValue
 } from '@chakra-ui/react'
-import { FaFacebook, FaGithub, FaGoogle } from 'react-icons/fa'
 
-import { Card } from '../components/card'
-import { DividerWithText } from '../components/divider-with-text'
 import { Link } from '../components/link'
 import { RegisterForm } from '../components/register-form'
 import { Logo } from '../components/logo'
@@ -31,24 +25,7 @@ export const SignUp = () => (
         <Text as="span">You have an account?</Text>
         <Link href="#">Login</Link>
       </Text>
-      <Card>
-        <RegisterForm />
-        <DividerWithText mt="6">or continue with</DividerWithText>
-        <SimpleGrid mt="6" columns={3} spacing="3">
-          <Button color="currentColor" variant="outline">
-            <VisuallyHidden>Login with Facebook</VisuallyHidden>
-            <FaFacebook />
-          </Button>
-          <Button color="currentColor" variant="outline">
-            <VisuallyHidden>Login with Google</VisuallyHidden>
-            <FaGoogle />
-          </Button>
-          <Button color="currentColor" variant="outline">
-            <VisuallyHidden>Login with Github</VisuallyHidden>
-            <FaGithub />
-          </Button>
-        </SimpleGrid>
-      </Card>
+      <RegisterForm />
     </Box>
   </Box>
 )
