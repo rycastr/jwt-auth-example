@@ -3,9 +3,9 @@ import { Navigate, Outlet } from 'react-router'
 import { useAuth } from '../hooks/auth'
 
 export const ProtectedRoutes = () => {
-  const { user } = useAuth()
+  const { credentials } = useAuth()
 
-  return (!user
+  return (!credentials
     ? <Navigate to="/signup" />
     : <Outlet />
   )
