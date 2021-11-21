@@ -21,13 +21,24 @@ import * as yup from 'yup'
 
 import { Card } from './card'
 import { DividerWithText } from './divider-with-text'
+import { useAuth } from '../hooks/auth'
+import { useNavigate } from 'react-router'
 
 export const RegisterForm = (props: HTMLChakraProps<'form'>) => {
+  const { signUp } = useAuth()
+
+  const navigate = useNavigate()
+
   const emailInputRef = useRef<HTMLInputElement>(null)
   const passwordInputRef = useRef<HTMLInputElement>(null)
   const confirmPasswordInputRef = useRef<HTMLInputElement>(null)
 
   const { isOpen, onToggle } = useDisclosure()
+
+  function resetPasswordInputs () {
+    passwordInputRef.current!.value = ''
+    confirmPasswordInputRef.current!.value = ''
+  }
 
   async function handleSubmit (event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -45,12 +56,17 @@ export const RegisterForm = (props: HTMLChakraProps<'form'>) => {
         confirmPassword: confirmPasswordInputRef.current?.value
       }, { abortEarly: false })
 
-      console.log({ email, password })
+      await signUp(email, password)
+      navigate('/')
     } catch (err) {
       if (err instanceof yup.ValidationError) {
         err.inner.forEach((error) => {
           console.log(error)
         })
+      } else {
+        // TODO: Implements authentication error handler
+        console.log(err)
+        resetPasswordInputs()
       }
     }
   }
