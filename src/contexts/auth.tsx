@@ -17,12 +17,12 @@ import {
 import firebaseApp from '../services/firebase'
 
 export type UserCredentials = {
-  user: User | null,
-  idToken?: string
+  user: User,
+  idToken: string
 }
 
 export type AuthContextData = {
-  credentials: UserCredentials,
+  credentials: UserCredentials | null,
   signUp: (email: string, password: string) => Promise<void>,
   signOut: () => Promise<void>
 }
@@ -34,13 +34,18 @@ type AuthContextProviderProps = {
 }
 
 export const AuthContextProvider = (props: AuthContextProviderProps) => {
-  const [credentials, setCredentials] = useState<UserCredentials>()
+  const [credentials, setCredentials] = useState<UserCredentials | null>()
 
   useEffect(() => {
-    const unsubscribe = onIdTokenChanged(getAuth(firebaseApp), updateCredentials)
+    const unsubscribe = onIdTokenChanged(getAuth(firebaseApp), async (newUser) => {
+      if (!newUser) {
+        unsubscribe()
+      }
+      await updateCredentials(newUser)
+    }, (err) => console.log(err))
 
     return () => unsubscribe()
-  }, [getAuth, firebaseApp])
+  }, [firebaseApp, getAuth])
 
   const signUp = useCallback(async (email: string, password: string) => {
     const result = await createUserWithEmailAndPassword(
@@ -48,19 +53,17 @@ export const AuthContextProvider = (props: AuthContextProviderProps) => {
       email,
       password
     )
-    updateCredentials(result.user)
-  }, [getAuth, firebaseApp])
+    await updateCredentials(result.user)
+  }, [firebaseApp, getAuth])
 
   const signOut = useCallback(async () => {
     await signOutFirebase(getAuth(firebaseApp))
+    await updateCredentials(null)
   }, [signOutFirebase, getAuth, firebaseApp])
 
   async function updateCredentials (newUser: User | null) {
     if (!newUser) {
-      setCredentials({
-        user: newUser,
-        idToken: undefined
-      })
+      setCredentials(null)
     } else {
       try {
         const newIdToken = await getIdToken(newUser)
