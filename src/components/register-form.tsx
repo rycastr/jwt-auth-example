@@ -25,7 +25,7 @@ import { useAuth } from '../hooks/auth'
 import { useNavigate } from 'react-router'
 
 export const RegisterForm = (props: HTMLChakraProps<'form'>) => {
-  const { signUp } = useAuth()
+  const { signUp, signUpWithGoogle, signUpWithFacebook, signUpWithGithub } = useAuth()
 
   const navigate = useNavigate()
 
@@ -68,6 +68,28 @@ export const RegisterForm = (props: HTMLChakraProps<'form'>) => {
         console.log(err)
         resetPasswordInputs()
       }
+    }
+  }
+
+  async function handleCustomProviderSignIn (provider: string) {
+    try {
+      switch (provider) {
+        case 'Facebook':
+          await signUpWithFacebook()
+          break
+
+        case 'Google':
+          await signUpWithGoogle()
+          break
+
+        case 'Github':
+          await signUpWithGithub()
+          break
+      }
+
+      navigate('/')
+    } catch (err) {
+      console.log(err)
     }
   }
 
@@ -136,15 +158,15 @@ export const RegisterForm = (props: HTMLChakraProps<'form'>) => {
       </chakra.form>
       <DividerWithText mt="6">or continue with</DividerWithText>
       <SimpleGrid mt="6" columns={3} spacing="3">
-        <Button color="currentColor" variant="outline">
+        <Button color="currentColor" variant="outline" onClick={() => handleCustomProviderSignIn('Facebook')}>
           <VisuallyHidden>Login with Facebook</VisuallyHidden>
           <FaFacebook />
         </Button>
-        <Button color="currentColor" variant="outline">
+        <Button color="currentColor" variant="outline" onClick={() => handleCustomProviderSignIn('Google')}>
           <VisuallyHidden>Login with Google</VisuallyHidden>
           <FaGoogle />
         </Button>
-        <Button color="currentColor" variant="outline">
+        <Button color="currentColor" variant="outline" onClick={() => handleCustomProviderSignIn('Github')}>
           <VisuallyHidden>Login with Github</VisuallyHidden>
           <FaGithub />
         </Button>

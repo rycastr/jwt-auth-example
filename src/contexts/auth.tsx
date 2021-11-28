@@ -11,7 +11,11 @@ import {
   createUserWithEmailAndPassword,
   onIdTokenChanged,
   signOut as signOutFirebase,
-  getIdToken
+  getIdToken,
+  GoogleAuthProvider,
+  signInWithPopup,
+  GithubAuthProvider,
+  FacebookAuthProvider
 } from 'firebase/auth'
 
 import firebaseApp from '../services/firebase'
@@ -24,6 +28,9 @@ export type UserCredentials = {
 export type AuthContextData = {
   credentials: UserCredentials | null,
   signUp: (email: string, password: string) => Promise<void>,
+  signUpWithGoogle: () => Promise<void>,
+  signUpWithGithub: () => Promise<void>,
+  signUpWithFacebook: () => Promise<void>,
   signOut: () => Promise<void>
 }
 
@@ -56,6 +63,24 @@ export const AuthContextProvider = (props: AuthContextProviderProps) => {
     await updateCredentials(result.user)
   }, [firebaseApp, getAuth])
 
+  const signUpWithFacebook = useCallback(async () => {
+    const facebookProvider = new FacebookAuthProvider()
+    const result = await signInWithPopup(getAuth(firebaseApp), facebookProvider)
+    await updateCredentials(result.user)
+  }, [])
+
+  const signUpWithGoogle = useCallback(async () => {
+    const googleProvider = new GoogleAuthProvider()
+    const result = await signInWithPopup(getAuth(firebaseApp), googleProvider)
+    await updateCredentials(result.user)
+  }, [])
+
+  const signUpWithGithub = useCallback(async () => {
+    const githubProvider = new GithubAuthProvider()
+    const result = await signInWithPopup(getAuth(firebaseApp), githubProvider)
+    await updateCredentials(result.user)
+  }, [])
+
   const signOut = useCallback(async () => {
     await signOutFirebase(getAuth(firebaseApp))
     await updateCredentials(null)
@@ -82,7 +107,14 @@ export const AuthContextProvider = (props: AuthContextProviderProps) => {
   }
 
   return (
-    <AuthContext.Provider value={{ credentials, signUp, signOut }}>
+    <AuthContext.Provider value={{
+      credentials,
+      signUp,
+      signUpWithGoogle,
+      signUpWithGithub,
+      signUpWithFacebook,
+      signOut
+    }} >
       {props.children}
     </AuthContext.Provider>
   )
